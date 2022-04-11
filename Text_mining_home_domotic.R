@@ -1,18 +1,3 @@
-# Analysis of domotic devices
-# URAP project
-# written by: Giorgia Chinazzo
-# Date: Feb 21, 2022
-
-# using regex to find all bigrams/trigrams of a word e.g. word = "hi [A-z]+"
-# pos <- tibble(words = str_extract_all(str_subset(df_comb$review,word),word)) %>% 
-#   group_by(words) %>% 
-#   count()
-# find the amount of word matches in the reviews
-# length(str_subset(df_comb$review, word))
-# see all the reviews with the word highlighted
-# str_view(str_subset(df_comb$review, word), word)
-
-
 # Packages
 library(tidyverse)
 library(tidytext)
@@ -127,12 +112,7 @@ for(i in c(1:nrow(df_comb_neg))){
   }
   df_comb_neg[i,]$cons_type <- category
 }
-                                  
-#Write 1 if there is an IEQ comment
-df_comb_neg$IEQ_negative_comment <- ifelse(df_comb_neg$IEQ_cons_type == "no negative", 0,1)
-
-
-
+                                
 
 
 ################### POSITIVE ANALYSIS ################
@@ -199,11 +179,6 @@ for(i in c(1:nrow(df_comb_pos))){
 }
 
 
-#Write 1 if there is an IEQ comment
-df_comb_pos$IEQ_positive_comment <- ifelse(df_comb_pos$IEQ_pos_type == "No_positive_comments", 0,1)
-
-
-
 ################ ______ MERGE POSITIVE AND NEGATIVE DATASETS AND SAVE FILES ______ #######
 
 #Save df_comb_pos 
@@ -211,62 +186,3 @@ write.csv(df_comb_pos, "...path...")
 
 #Save df_comb_neg 
 write.csv(df_comb_neg, "...path...")
-
-
-
-################# __________ SUMMARY reviewS______________################
-
-
-####Negative
-
-
-#Count how many IEQ complaints per category (EXCLUDING the category "More_than_one_complaint")
-df_comb_merged %>% 
-  gather(key = "IEQ_cons_type",
-         value = "Number_IEQ_neg_type",
-         IAQ_neg:Design_neg)%>% #create an additional column that counts the number of complaints (first create two columns, including key and value)
-subset(Number_IEQ_neg_type!= 0)%>% 
-  group_by(IEQ_cons_type) %>% 
-  summarise(count = n()) %>% 
-  arrange(desc(count)) 
-
-#Count how many IEQ complaints per category (INCLUDING the category "More_than_one_complaint")
-df_comb_merged %>% 
-  group_by(IEQ_cons_type) %>% 
-  summarise(count = n()) %>% 
-  arrange(desc(count)) 
-
-
-
-####Positive
-
-#Count how many IEQ_pos_type per category (EXCLUDING the category "More_than_one_complaint")
-df_comb_merged %>% 
-  gather(key = "IEQ_pos_type",
-         value = "Number_IEQ_pos_type",
-         IAQ_pos:Design_pos)%>% #create an additional column that counts the number of complaints (first create two columns, including key and value)
-  subset(Number_IEQ_pos_type!= 0)%>% 
-  group_by(IEQ_pos_type) %>% 
-  summarise(count = n()) %>% 
-  arrange(desc(count)) 
-
-#Count how many IEQ complaints per category (INCLUDING the category "More_than_one_complaint")
-df_comb_merged %>% 
-  group_by(IEQ_pos_type) %>% 
-  summarise(count = n()) %>% 
-  arrange(desc(count)) 
-
-
-
-
-
-### NEGATIVE & POSITIVE TOGETHER
-
-#Create final positive-negative score (balance score)
-df_comb_merged$balscore <- (df_comb_merged$IAQ_pos + df_comb_merged$Visual_pos + df_comb_merged$Thermal_pos + df_comb_merged$Acoustic_pos + df_comb_merged$Overall_pos + df_comb_merged$Productivity_pos + df_comb_merged$Design_pos + df_comb_merged$View_pos + df_comb_merged$Spaciousness_pos + df_comb_merged$Ergonomics_pos + df_comb_merged$Greenery_pos + df_comb_merged$Cleanliness_pos)-
-  (df_comb_merged$visual_neg + df_comb_merged$Thermal_neg + df_comb_merged$Acoustic_neg + df_comb_merged$IAQ_neg + df_comb_merged$Productivity_neg + df_comb_merged$Spaciousness_neg + df_comb_merged$Ergonomics_neg + df_comb_merged$Cleanliness_neg + df_comb_merged$Design_neg + df_comb_merged$View_neg + df_comb_merged$Overall_neg)
-  
-
-
-
-
